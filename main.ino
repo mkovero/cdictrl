@@ -78,4 +78,10 @@ void loop()
         camHit = false; // reset camHit state.
         attachInterrupt(digitalPinToInterrupt(cam), camInterrupt, RISING);
     }
+
+    int curTps = tpsRead();
+    if ( curTps < 20 ) { curTps = 20; } // bit hackery to allow pressure valve to stay bit open for testing, this should be normally be maintained by temperature and line pressure.
+
+    int pctrl = map(curTps, 0, 100, 255, 0);
+    analogWrite(pvalve, pctrl);
 }
