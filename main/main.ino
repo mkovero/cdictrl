@@ -1,7 +1,11 @@
 #include <Arduino.h>
-#include "TeensyDelay/src/TeensyDelay.h"
+#include <AutoPID.h>
+#include "include/TeensyDelay.h"
 #include "include/pins.h"
 #include "include/config.h"
+#include "include/sensors.h"
+boolean fired = false;
+int pressurePWM;
 /*
     CDI engine controller
     Copyright (C) 2018 Markus Kovero <mui@mui.fi>
@@ -21,9 +25,21 @@
 
     Big thanks to everyone taking part on 7226ctrl project allowing this to happen.
 */
+   // AutoPID myPID(&curFp, &pressureLim, &pressurePWM, 0, 255, Kp, Ki, Kd);
 
+void callback()
+{
+    digitalWriteFast(firedCylinder, LOW);
+    if (debugEnabled)
+    {
+        Serial.print("Stopping inject:");
+        Serial.println(firingOrder[cylinder]);
+    }
+    fired = false; // reset camHit state.
+}
 void setup()
 {
+
     // Injectors
     pinMode(in1, OUTPUT);
     pinMode(in2, OUTPUT);
@@ -43,6 +59,8 @@ void setup()
     pinMode(etemp, INPUT);
     pinMode(atemp, INPUT);
     pinMode(tps, INPUT);
+    TeensyDelay::begin();                   // setup timer
+    TeensyDelay::addDelayChannel(callback); // add a delay channel and attach callback function
 }
 
 void camInterrupt()
@@ -50,38 +68,49 @@ void camInterrupt()
     camHit = true;
 }
 
-void callback() { digitalWrite(firedCylinder, LOW); }
-
 void loop()
 {
-    if (camHit)
+    if (camHit && !fired)
     {
+        fired = true;
         if (debugEnabled)
         {
             Serial.print("Injecting cylinder:");
             Serial.println(firingOrder[cylinder]);
         }
-        digitalWrite(firingOrder[cylinder], HIGH);
+        digitalWriteFast(firingOrder[cylinder], HIGH);
         firedCylinder = firingOrder[cylinder];
-        TeensyDelay::trigger(PRIDELAY);
-        
-        if (cylinder <= nrCylinders)
+        TeensyDelay::trigger(10000);
+
+        if (cylinder < 8)
         {
             cylinder++;
         }
         else
         {
-            cylinder = 1;
+            cylinder = 0;
         }
 
-        detachInterrupt(cam);
+        // detachInterrupt(cam);
         camHit = false; // reset camHit state.
-        attachInterrupt(digitalPinToInterrupt(cam), camInterrupt, RISING);
+        //attachInterrupt(digitalPinToInterrupt(cam), camInterrupt, RISING);
+    } else if (millis() - lastTimedRun > pollInterval)
+    {
+        pollSystem();
     }
-
-    int curTps = tpsRead();
-    if ( curTps < 20 ) { curTps = 20; } // bit hackery to allow pressure valve to stay bit open for testing, this should be normally be maintained by temperature and line pressure.
-
-    int pctrl = map(curTps, 0, 100, 255, 0);
-    analogWrite(pvalve, pctrl);
 }
+
+void pollSystem() { 
+   // pressureCtrl();
+    lastTimedRun = millis();
+}
+
+/*void pressureCtrl() {
+    curFp = fpRead();
+    pressureLim = readMap(pressureMap, tpsRead(), oilTempRead());
+
+    myPID.setBangBang(100, 50);
+    myPID.setTimeStep(100);
+    myPID.run();
+    analogWrite(pvalve, pressurePWM);
+}*/

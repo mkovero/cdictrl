@@ -3,27 +3,7 @@
 // Macro for sizeof for better support with 2d arrays.
 #define LEN(arr) ((int)(sizeof(arr) / sizeof(arr)[0]))
 int lastXval, lastYval;
-int maxBoostPressure = 700; // Max pressure on boost sensor
-
 // Calculation helpers
-
-// Mapping throttle position sensor voltage to percentage
-int readTPSVoltage(int voltage)
-{
- 
-  int result = map(voltage, 1900, 800, 0, 100);
-    return result;
-  
-}
-
-// Mapping boost sensor voltage to percentage
-int readBoostVoltage(int voltage)
-{
- 
-  int result = map(voltage, 450, 2670, 0, 3000); // NXP MPX5700AP (range 0-700kPa)
-    return result;
-
-}
 
 // Function to read 2d maps from flash (maps declared with PROGMEM)
 int readMap(const int theMap[14][12], int x, int y)

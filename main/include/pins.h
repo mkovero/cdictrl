@@ -1,14 +1,14 @@
 // Pin definitions
 
 // Injectors (on PWM enabled pins)
-#define in1 2
-#define in2 3
-#define in3 4
-#define in4 5
-#define in5 6
+#define in1 6
+#define in2 8
+#define in3 2
+#define in4 30
+#define in5 35
 #define in6 7
-#define in7 8
-#define in8 9
+#define in7 38
+#define in8 29
 
 // Pressure valve (PWM enabled)
 #define pvalve 10

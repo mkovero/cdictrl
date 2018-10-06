@@ -1,6 +1,6 @@
 #include <Arduino.h>
-//Temperature to injection map
-static const int injectionMap[14][12] PROGMEM {
+//Temperature to injection pressure map
+static const int pressureMap[14][12] PROGMEM {
 {999,        0,   10,   20,   30,   40,   50,   60,   70,   80,   90,   100 },   //load %
 //-----------------------------------------------------------------------
 { -20,      23,   28,   33,   33,   38,   56,   86,   96,   96,   98,  100 },
