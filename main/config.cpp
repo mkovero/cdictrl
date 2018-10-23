@@ -3,7 +3,7 @@
 boolean camHit = false;
 boolean debugEnabled = true; // debug
 const byte nrCylinders = 8; // number of cylinders
-byte firingOrder[8] = { in2,in3,in1,in5,in4,in8,in7,in6 }; // firing order
+byte firingOrder[8] = { in1,in5,in4,in2,in6,in3,in7,in8 }; // firing order
 byte nextCylinder,firedCylinder,cylinder = 0;
 double pollInterval = 100;
 double lastTimedRun = 0;
