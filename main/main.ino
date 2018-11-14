@@ -82,7 +82,7 @@ void loop()
         firedCylinder = firingOrder[cylinder];
         TeensyDelay::trigger(10000);
 
-        if (cylinder < 8)
+        if (cylinder < 7)
         {
             cylinder++;
         }
